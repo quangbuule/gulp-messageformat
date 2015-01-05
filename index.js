@@ -74,20 +74,31 @@ module.exports = function (options) {
 			return;
 		}
 
-		var result = [
-			'(function(g){',
-			'var ' + options.namespace + ' = ' + mf.functions() + ';',
-			parsedFile.join(EOL),
-			'return g["' + options.namespace + '"] = ' + options.namespace + ';',
-			'})(' + options.global + ');'
-		].join(EOL);
+    var result;
+
+		if (options.module) {
+			result = [
+				'var i18n = ' + mf.functions() + ';',
+				parsedFile.join(EOL),
+				'module.exports = i18n;'
+			].join(EOL);
+
+		} else {
+			result = [
+				'(function(g){',
+				'var ' + options.namespace + ' = ' + mf.functions() + ';',
+				parsedFile.join(EOL),
+				'return g["' + options.namespace + '"] = ' + options.namespace + ';',
+				'})(' + options.global + ');'
+			].join(EOL);
+		}
 
 		resultFile.contents = new Buffer(result);
 
 		this.push(resultFile);
 
 		cb();
-	}
+		}
 
 	return through.obj(parse, flush);
 
